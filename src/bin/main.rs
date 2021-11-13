@@ -9,6 +9,8 @@ use raytracing::{
     vec3::{Color, Point3, Vec3},
 };
 
+const FACTOR: f64 = 1.0;
+
 fn ray_color(ray: Ray, world: &HittableList) -> Color {
     let mut rec = HitRecord::default();
     if world.hit(ray, 0.0, INFINITY, &mut rec) {
@@ -23,15 +25,17 @@ fn ray_color(ray: Ray, world: &HittableList) -> Color {
 fn main() -> Result<(), std::io::Error> {
     // Image
     const ASPECT_RATIO: f64 = 16.0 / 9.0;
-    const IMAGE_WIDTH: i32 = 400;
+    const IMAGE_WIDTH: i32 = (400.0 * FACTOR) as i32;
     const IMAGE_HEIGHT: i32 = (IMAGE_WIDTH as f64 / ASPECT_RATIO) as i32;
 
     // World
     let world: HittableList = vec![
+        // sphere
         Box::new(Sphere {
             center: Vec3::new(0, 0, -1),
             radius: 0.5,
         }),
+        // ground
         Box::new(Sphere {
             center: Vec3::new(0, -100.5, -1),
             radius: 100.0,
