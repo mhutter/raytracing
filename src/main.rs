@@ -11,7 +11,7 @@ use raytracing::{
 
 const FACTOR: f64 = 1.0;
 
-fn ray_color(ray: Ray, world: &HittableList) -> Color {
+fn ray_color(ray: Ray, world: &dyn Hittable) -> Color {
     let mut rec = HitRecord::default();
     if world.hit(ray, 0.0, INFINITY, &mut rec) {
         return 0.5 * (rec.normal + Color::new(1, 1, 1));
