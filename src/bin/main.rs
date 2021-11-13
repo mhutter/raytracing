@@ -1,32 +1,22 @@
-use std::io::{stderr, Write};
+use std::{
+    f64::INFINITY,
+    io::{stderr, Write},
+};
 
 use raytracing::{
+    hittable::{HitRecord, Hittable, HittableList, Sphere},
     ray::Ray,
     vec3::{Color, Point3, Vec3},
 };
 
-fn hit_sphere(center: Point3, radius: f64, ray: Ray) -> f64 {
-    let oc = ray.origin - center;
-    let a = ray.direction.length_squared();
-    let half_b = oc.dot(ray.direction);
-    let c = oc.length_squared() - radius * radius;
-    let discriminant = half_b * half_b - a * c;
-
-    if discriminant < 0.0 {
-        return -1.0;
-    }
-    (-half_b - discriminant.sqrt()) / a
-}
-
-fn ray_color(ray: Ray) -> Color {
-    let t = hit_sphere(Vec3::new(0, 0, -1), 0.5, ray);
-    if t > 0.0 {
-        let n = (ray.at(t) - Vec3::new(0, 0, -1)).unit_vector();
-        return 0.5 * Color::new(n.x() + 1.0, n.y() + 1.0, n.z() + 1.0);
+fn ray_color(ray: Ray, world: &HittableList) -> Color {
+    let mut rec = HitRecord::default();
+    if world.hit(ray, 0.0, INFINITY, &mut rec) {
+        return 0.5 * (rec.normal + Color::new(1, 1, 1));
     }
 
     let unit_direction = ray.direction.unit_vector();
-    let t = 0.5 * unit_direction.y() + 1.0;
+    let t = 0.5 * (unit_direction.y() + 1.0);
     (1.0 - t) * Color::new(1, 1, 1) + t * Color::new(0.5, 0.7, 1.0)
 }
 
@@ -35,6 +25,18 @@ fn main() -> Result<(), std::io::Error> {
     const ASPECT_RATIO: f64 = 16.0 / 9.0;
     const IMAGE_WIDTH: i32 = 400;
     const IMAGE_HEIGHT: i32 = (IMAGE_WIDTH as f64 / ASPECT_RATIO) as i32;
+
+    // World
+    let world: HittableList = vec![
+        Box::new(Sphere {
+            center: Vec3::new(0, 0, -1),
+            radius: 0.5,
+        }),
+        Box::new(Sphere {
+            center: Vec3::new(0, -100.5, -1),
+            radius: 100.0,
+        }),
+    ];
 
     // Camera
     const VIEWPORT_HEIGHT: f64 = 2.0;
@@ -60,7 +62,7 @@ fn main() -> Result<(), std::io::Error> {
             let v: f64 = j as f64 / height;
             let direction = lower_left_corner + u * horizontal + v * vertical - origin;
             let ray = Ray { origin, direction };
-            let color = ray_color(ray);
+            let color = ray_color(ray, &world);
             println!("{}", color);
         }
     }

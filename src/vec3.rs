@@ -1,4 +1,4 @@
-use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
+use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
 pub mod color;
 pub use color::*;
@@ -6,7 +6,7 @@ pub mod point3;
 pub use point3::*;
 
 /// Vec3 represents a three-dimensional vector
-#[derive(Debug, PartialEq, Clone, Copy)]
+#[derive(Debug, PartialEq, Clone, Copy, Default)]
 pub struct Vec3(pub f64, pub f64, pub f64);
 
 impl Vec3 {
@@ -175,6 +175,14 @@ impl DivAssign<f64> for Vec3 {
     }
 }
 
+impl Neg for Vec3 {
+    type Output = Self;
+
+    fn neg(self) -> Self::Output {
+        Self(-self.0, -self.1, -self.2)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -315,5 +323,14 @@ mod tests {
         let mut a = Vec3::new(2, 4, 6);
         a /= 2.0;
         assert_eq!(Vec3::new(1, 2, 3), a);
+    }
+
+    #[test]
+    fn test_neg() {
+        let a = Vec3::new(1, 2, 3);
+        let b = Vec3::new(4, 5, 6);
+
+        assert_eq!(Vec3::new(-1, -2, -3), -a);
+        assert_eq!(Vec3::new(-4, -5, -6), -b);
     }
 }
