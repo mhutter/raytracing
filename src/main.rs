@@ -3,10 +3,12 @@ use std::{
     io::{stderr, stdout, BufWriter, Write},
 };
 
+use rand::Rng;
 use raytracing::{
+    camera::Camera,
     hittable::{HitRecord, Hittable, HittableList, Sphere},
     ray::Ray,
-    vec3::{Color, Point3, Vec3},
+    vec3::{Color, Vec3},
 };
 
 const FACTOR: f64 = 1.0;
@@ -27,6 +29,7 @@ fn main() -> Result<(), std::io::Error> {
     const ASPECT_RATIO: f64 = 16.0 / 9.0;
     const IMAGE_WIDTH: i32 = (400.0 * FACTOR) as i32;
     const IMAGE_HEIGHT: i32 = (IMAGE_WIDTH as f64 / ASPECT_RATIO) as i32;
+    const SAMPLES_PER_PIXEL: i32 = 100;
 
     // World
     let world: HittableList = vec![
@@ -43,15 +46,7 @@ fn main() -> Result<(), std::io::Error> {
     ];
 
     // Camera
-    const VIEWPORT_HEIGHT: f64 = 2.0;
-    const VIEWPORT_WIDTH: f64 = ASPECT_RATIO * VIEWPORT_HEIGHT;
-    const FOCAL_LENGTH: f64 = 1.0;
-
-    let origin = Point3::new(0, 0, 0);
-    let horizontal = Vec3::new(VIEWPORT_WIDTH, 0, 0);
-    let vertical = Vec3::new(0, VIEWPORT_HEIGHT, 0);
-    let lower_left_corner =
-        origin - horizontal / 2.0 - vertical / 2.0 - Vec3::new(0, 0, FOCAL_LENGTH);
+    let camera: Camera = Camera::default();
 
     // Render
     println!("P3\n{} {}\n255", IMAGE_WIDTH, IMAGE_HEIGHT);
@@ -63,12 +58,14 @@ fn main() -> Result<(), std::io::Error> {
     for j in (0..IMAGE_HEIGHT).rev() {
         write!(&stderr, "\rScanlines remaining: {} of {} ", j, IMAGE_HEIGHT)?;
         for i in 0..IMAGE_WIDTH {
-            let u: f64 = i as f64 / width;
-            let v: f64 = j as f64 / height;
-            let direction = lower_left_corner + u * horizontal + v * vertical - origin;
-            let ray = Ray { origin, direction };
-            let color = ray_color(ray, &world);
-            writeln!(stdout, "{}", color)?;
+            let mut color = Color::default();
+            for _ in 0..SAMPLES_PER_PIXEL {
+                let u = (i as f64 + rand::thread_rng().gen::<f64>()) / width;
+                let v = (j as f64 + rand::thread_rng().gen::<f64>()) / height;
+                let ray = camera.get_ray(u, v);
+                color += ray_color(ray, &world);
+            }
+            color.write(&mut stdout, SAMPLES_PER_PIXEL)?;
         }
     }
     stdout.flush()?;

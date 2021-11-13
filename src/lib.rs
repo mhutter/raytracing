@@ -1,5 +1,6 @@
 use std::f64::consts::PI;
 
+pub mod camera;
 pub mod hittable;
 pub mod ray;
 pub mod vec3;
