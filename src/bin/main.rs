@@ -1,6 +1,6 @@
 use std::{
     f64::INFINITY,
-    io::{stderr, Write},
+    io::{stderr, stdout, BufWriter, Write},
 };
 
 use raytracing::{
@@ -56,6 +56,7 @@ fn main() -> Result<(), std::io::Error> {
     // Render
     println!("P3\n{} {}\n255", IMAGE_WIDTH, IMAGE_HEIGHT);
     let stderr = stderr();
+    let mut stdout = BufWriter::new(stdout());
     let width = (IMAGE_WIDTH - 1) as f64;
     let height = (IMAGE_HEIGHT - 1) as f64;
 
@@ -67,9 +68,9 @@ fn main() -> Result<(), std::io::Error> {
             let direction = lower_left_corner + u * horizontal + v * vertical - origin;
             let ray = Ray { origin, direction };
             let color = ray_color(ray, &world);
-            println!("{}", color);
+            writeln!(stdout, "{}", color)?;
         }
     }
-
+    stdout.flush()?;
     write!(&stderr, "\nDone\n")
 }
