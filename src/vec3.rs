@@ -1,5 +1,8 @@
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
 
+pub mod color;
+pub use color::*;
+
 /// Vec3 represents a three-dimensional vector
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub struct Vec3(pub f64, pub f64, pub f64);
