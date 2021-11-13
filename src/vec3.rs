@@ -32,6 +32,16 @@ impl Vec3 {
         Self(x.into(), y.into(), z.into())
     }
 
+    pub fn x(self) -> f64 {
+        self.0
+    }
+    pub fn y(self) -> f64 {
+        self.1
+    }
+    pub fn z(self) -> f64 {
+        self.2
+    }
+
     /// TODO: write proper docs here
     pub fn length(self) -> f64 {
         self.length_squared().sqrt()
@@ -118,6 +128,13 @@ impl Mul<f64> for Vec3 {
 
     fn mul(self, rhs: f64) -> Self::Output {
         Self(self.0 * rhs, self.1 * rhs, self.2 * rhs)
+    }
+}
+impl Mul<Vec3> for f64 {
+    type Output = Vec3;
+
+    fn mul(self, rhs: Vec3) -> Self::Output {
+        rhs * self
     }
 }
 impl MulAssign<f64> for Vec3 {
@@ -254,6 +271,7 @@ mod tests {
     fn test_mul_f64() {
         let a = Vec3::new(1, 2, 3);
         assert_eq!(Vec3::new(1.5, 3.0, 4.5), a * 1.5);
+        assert_eq!(Vec3::new(1.5, 3.0, 4.5), 1.5 * a);
     }
 
     #[test]
