@@ -1,6 +1,6 @@
 use std::f64::consts::PI;
 
-use vec3::Point3;
+use vec3::{Point3, Vec3};
 
 pub mod camera;
 pub mod hittable;
@@ -18,4 +18,8 @@ pub fn random_in_unit_sphere() -> Point3 {
             return p;
         }
     }
+}
+
+pub fn random_unit_vector() -> Vec3 {
+    random_in_unit_sphere().unit_vector()
 }

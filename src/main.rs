@@ -7,7 +7,7 @@ use rand::Rng;
 use raytracing::{
     camera::Camera,
     hittable::{HitRecord, Hittable, HittableList, Sphere},
-    random_in_unit_sphere,
+    random_unit_vector,
     ray::Ray,
     vec3::{Color, Vec3},
 };
@@ -22,7 +22,7 @@ fn ray_color(ray: Ray, world: &dyn Hittable, depth: u8) -> Color {
 
     let mut rec = HitRecord::default();
     if world.hit(ray, 0.001, INFINITY, &mut rec) {
-        let target = rec.p + rec.normal + random_in_unit_sphere();
+        let target = rec.p + rec.normal + random_unit_vector();
         let child_ray = Ray {
             origin: rec.p,
             direction: target - rec.p,
