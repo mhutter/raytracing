@@ -8,26 +8,23 @@ use raytracing::{
     camera::Camera,
     hittable::{Hittable, HittableList, Sphere},
     material::Lambertian,
-    random_unit_vector,
     ray::Ray,
     vec3::{Color, Vec3},
 };
 
 const FACTOR: f64 = 1.0;
 
-fn ray_color(ray: Ray, world: &dyn Hittable, depth: u8) -> Color {
+fn ray_color(ray: Ray, world: &impl Hittable, depth: u8) -> Color {
     if depth == 0 {
         // exceeded the ray bounce limit, no light is gathered.
         return Color::new(0, 0, 0);
     }
 
     if let Some(hit) = world.hit(ray, 0.001, INFINITY) {
-        let target = hit.p + hit.normal + random_unit_vector();
-        let child_ray = Ray {
-            origin: hit.p,
-            direction: target - hit.p,
+        return match hit.material.scatter(ray, &hit) {
+            (scattered, Some(attenuation)) => attenuation * ray_color(scattered, world, depth - 1),
+            _ => Color::new(0, 0, 0),
         };
-        return 0.5 * ray_color(child_ray, world, depth - 1);
     }
 
     let unit_direction = ray.direction.unit_vector();

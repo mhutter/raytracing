@@ -14,18 +14,18 @@ impl Lambertian {
 }
 
 impl Material for Lambertian {
-    fn scatter(&self, _ray: Ray, rec: HitRecord) -> (Color, Ray) {
+    fn scatter(&self, _ray: Ray, rec: &HitRecord) -> (Ray, Option<Color>) {
         let scatter_direction = match rec.normal + random_unit_vector() {
             dir if dir.near_zero() => rec.normal,
             dir => dir,
         };
 
         (
-            self.albedo,
             Ray {
                 origin: rec.p,
                 direction: scatter_direction,
             },
+            Some(self.albedo),
         )
     }
 }
