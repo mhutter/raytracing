@@ -1,15 +1,16 @@
-use crate::{hittable::HitRecord, ray::Ray, vec3::Color};
+use crate::{hittable::HitRecord, random_in_unit_sphere, ray::Ray, vec3::Color};
 
 use super::Material;
 
 #[derive(Clone, Copy)]
 pub struct Metal {
-    pub albedo: Color,
+    albedo: Color,
+    fuzz: f64,
 }
 
 impl Metal {
-    pub fn new(albedo: Color) -> Self {
-        Self { albedo }
+    pub fn new(albedo: Color, fuzz: f64) -> Self {
+        Self { albedo, fuzz }
     }
 }
 
@@ -18,7 +19,7 @@ impl Material for Metal {
         let reflected = ray.direction.reflect(rec.normal);
         let scattered = Ray {
             origin: rec.p,
-            direction: reflected,
+            direction: reflected + self.fuzz * random_in_unit_sphere(),
         };
 
         match scattered.direction.dot(rec.normal) {

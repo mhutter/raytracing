@@ -58,13 +58,13 @@ fn main() -> Result<(), std::io::Error> {
         Box::new(Sphere {
             center: Vec3::new(-1, 0, -1),
             radius: 0.5,
-            material: Metal::new(Color::new(0.8, 0.8, 0.8)),
+            material: Metal::new(Color::new(0.8, 0.8, 0.8), 0.3),
         }),
         // Spheres - right
         Box::new(Sphere {
             center: Vec3::new(1, 0, -1),
             radius: 0.5,
-            material: Metal::new(Color::new(0.8, 0.6, 0.2)),
+            material: Metal::new(Color::new(0.8, 0.6, 0.2), 1.0),
         }),
     ];
 
