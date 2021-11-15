@@ -1,4 +1,5 @@
 use crate::{
+    material::Material,
     ray::Ray,
     vec3::{Point3, Vec3},
 };
@@ -6,10 +7,10 @@ use crate::{
 mod sphere;
 pub use sphere::*;
 
-#[derive(Clone, Copy, Default)]
 pub struct HitRecord {
     pub p: Point3,
     pub normal: Vec3,
+    pub material: Box<dyn Material>,
     pub t: f64,
     pub front_face: bool,
 }
@@ -26,25 +27,23 @@ impl HitRecord {
 }
 
 pub trait Hittable {
-    fn hit(&self, ray: Ray, t_min: f64, t_max: f64, rec: &mut HitRecord) -> bool;
+    fn hit(&self, ray: Ray, t_min: f64, t_max: f64) -> Option<HitRecord>;
 }
 
 pub type HittableList = Vec<Box<dyn Hittable>>;
 
 impl Hittable for HittableList {
-    fn hit(&self, ray: Ray, t_min: f64, t_max: f64, rec: &mut HitRecord) -> bool {
-        let mut hit_anything = false;
+    fn hit(&self, ray: Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
+        let mut hit = None;
         let mut closest_so_far = t_max;
 
         for hittable in self.iter() {
-            // We assume that any implementation of `hit` does not actually
-            // write to `rec` unless there IS a hit, so we pass `rec` directly
-            if hittable.hit(ray, t_min, closest_so_far, rec) {
-                hit_anything = true;
+            if let Some(rec) = hittable.hit(ray, t_min, closest_so_far) {
                 closest_so_far = rec.t;
+                hit = Some(rec);
             }
         }
 
-        hit_anything
+        hit
     }
 }

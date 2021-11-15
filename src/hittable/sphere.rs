@@ -1,20 +1,30 @@
-use crate::{hittable::HitRecord, ray::Ray, vec3::Point3};
+use crate::{
+    hittable::HitRecord,
+    material::Material,
+    ray::Ray,
+    vec3::{Point3, Vec3},
+};
 
 use super::Hittable;
 
-pub struct Sphere {
+pub struct Sphere<M: Material> {
     pub center: Point3,
     pub radius: f64,
+    pub material: M,
 }
 
-impl Sphere {
-    pub fn new(center: Point3, radius: f64) -> Self {
-        Self { center, radius }
+impl<M: Material> Sphere<M> {
+    pub fn new(center: Point3, radius: f64, material: M) -> Self {
+        Self {
+            center,
+            radius,
+            material,
+        }
     }
 }
 
-impl Hittable for Sphere {
-    fn hit(&self, ray: Ray, t_min: f64, t_max: f64, rec: &mut HitRecord) -> bool {
+impl<M: 'static + Material + Copy> Hittable for Sphere<M> {
+    fn hit(&self, ray: Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let oc = ray.origin - self.center;
         let a = ray.direction.length_squared();
         let half_b = oc.dot(ray.direction);
@@ -24,7 +34,7 @@ impl Hittable for Sphere {
 
         if discriminant < 0.0 {
             // did not hit
-            return false;
+            return None;
         }
 
         // Find nearset root that lies in acceptable range
@@ -33,16 +43,21 @@ impl Hittable for Sphere {
         if root < t_min || t_max < root {
             root = (-half_b + sqrtd) / a;
             if root < t_min || t_max < root {
-                return false;
+                return None;
             }
         }
 
         // We have a hit
-        rec.t = root;
-        rec.p = ray.at(rec.t);
-        let outward_normal = (rec.p - self.center) / self.radius;
-        rec.set_face_normal(ray, outward_normal);
+        let mut hit = HitRecord {
+            t: root,
+            p: ray.at(root),
+            material: Box::new(self.material),
+            normal: Vec3::default(),
+            front_face: true,
+        };
+        let outward_normal = (hit.p - self.center) / self.radius;
+        hit.set_face_normal(ray, outward_normal);
 
-        true
+        Some(hit)
     }
 }

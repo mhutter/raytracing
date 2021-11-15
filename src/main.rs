@@ -6,7 +6,8 @@ use std::{
 use rand::Rng;
 use raytracing::{
     camera::Camera,
-    hittable::{HitRecord, Hittable, HittableList, Sphere},
+    hittable::{Hittable, HittableList, Sphere},
+    material::Lambertian,
     random_unit_vector,
     ray::Ray,
     vec3::{Color, Vec3},
@@ -20,12 +21,11 @@ fn ray_color(ray: Ray, world: &dyn Hittable, depth: u8) -> Color {
         return Color::new(0, 0, 0);
     }
 
-    let mut rec = HitRecord::default();
-    if world.hit(ray, 0.001, INFINITY, &mut rec) {
-        let target = rec.p + rec.normal.random_in_hemisphere();
+    if let Some(hit) = world.hit(ray, 0.001, INFINITY) {
+        let target = hit.p + hit.normal + random_unit_vector();
         let child_ray = Ray {
-            origin: rec.p,
-            direction: target - rec.p,
+            origin: hit.p,
+            direction: target - hit.p,
         };
         return 0.5 * ray_color(child_ray, world, depth - 1);
     }
@@ -49,11 +49,13 @@ fn main() -> Result<(), std::io::Error> {
         Box::new(Sphere {
             center: Vec3::new(0, 0, -1),
             radius: 0.5,
+            material: Lambertian::new(Color::new(0.7, 0.3, 0.3)),
         }),
         // ground
         Box::new(Sphere {
             center: Vec3::new(0, -100.5, -1),
             radius: 100.0,
+            material: Lambertian::new(Color::new(0.8, 0.8, 0.0)),
         }),
     ];
 

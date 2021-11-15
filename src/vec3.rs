@@ -121,6 +121,12 @@ impl Vec3 {
             -in_unit_sphere
         }
     }
+
+    /// Returns whether all 3 values are below 0.00000001
+    pub fn near_zero(self) -> bool {
+        let s = 1e-8;
+        (self.0.abs() < s) && (self.1.abs() < s) && (self.2.abs() < s)
+    }
 }
 
 impl Add for Vec3 {
