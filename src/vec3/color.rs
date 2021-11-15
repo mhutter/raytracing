@@ -7,6 +7,12 @@ pub type Color = Vec3;
 impl Color {
     pub fn write(self, out: &mut dyn Write, samples_per_pixel: i32) -> Result<()> {
         let Vec3(r, g, b) = self / (samples_per_pixel as f64);
+
+        // gamma-correct for gamma=2.0
+        let r = r.sqrt();
+        let g = g.sqrt();
+        let b = b.sqrt();
+
         writeln!(
             out,
             "{} {} {}",
