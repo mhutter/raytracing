@@ -7,16 +7,27 @@ use rand::Rng;
 use raytracing::{
     camera::Camera,
     hittable::{HitRecord, Hittable, HittableList, Sphere},
+    random_in_unit_sphere,
     ray::Ray,
     vec3::{Color, Vec3},
 };
 
 const FACTOR: f64 = 1.0;
 
-fn ray_color(ray: Ray, world: &dyn Hittable) -> Color {
+fn ray_color(ray: Ray, world: &dyn Hittable, depth: u8) -> Color {
+    if depth == 0 {
+        // exceeded the ray bounce limit, no light is gathered.
+        return Color::new(0, 0, 0);
+    }
+
     let mut rec = HitRecord::default();
-    if world.hit(ray, 0.0, INFINITY, &mut rec) {
-        return 0.5 * (rec.normal + Color::new(1, 1, 1));
+    if world.hit(ray, 0.001, INFINITY, &mut rec) {
+        let target = rec.p + rec.normal + random_in_unit_sphere();
+        let child_ray = Ray {
+            origin: rec.p,
+            direction: target - rec.p,
+        };
+        return 0.5 * ray_color(child_ray, world, depth - 1);
     }
 
     let unit_direction = ray.direction.unit_vector();
@@ -30,6 +41,7 @@ fn main() -> Result<(), std::io::Error> {
     const IMAGE_WIDTH: i32 = (400.0 * FACTOR) as i32;
     const IMAGE_HEIGHT: i32 = (IMAGE_WIDTH as f64 / ASPECT_RATIO) as i32;
     const SAMPLES_PER_PIXEL: i32 = 100;
+    const MAX_DEPTH: u8 = 50;
 
     // World
     let world: HittableList = vec![
@@ -63,7 +75,7 @@ fn main() -> Result<(), std::io::Error> {
                 let u = (i as f64 + rand::thread_rng().gen::<f64>()) / width;
                 let v = (j as f64 + rand::thread_rng().gen::<f64>()) / height;
                 let ray = camera.get_ray(u, v);
-                color += ray_color(ray, &world);
+                color += ray_color(ray, &world, MAX_DEPTH);
             }
             color.write(&mut stdout, SAMPLES_PER_PIXEL)?;
         }

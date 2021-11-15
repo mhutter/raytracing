@@ -4,6 +4,7 @@ pub mod color;
 pub use color::*;
 pub mod point3;
 pub use point3::*;
+use rand::Rng;
 
 /// Vec3 represents a three-dimensional vector
 #[derive(Debug, PartialEq, Clone, Copy, Default)]
@@ -30,6 +31,37 @@ impl Vec3 {
         V: Into<f64>,
     {
         Self(x.into(), y.into(), z.into())
+    }
+
+    /// Create a new random unit vector
+    ///
+    /// Example:
+    /// ```
+    /// use raytracing::vec3::Vec3;
+    ///
+    /// let r = Vec3::new_random();
+    /// assert!(r.0 >= 0.0);
+    /// assert!(r.0 < 1.0);
+    /// assert!(r.1 >= 0.0);
+    /// assert!(r.1 < 1.0);
+    /// assert!(r.2 >= 0.0);
+    /// assert!(r.2 < 1.0);
+    /// ```
+    pub fn new_random() -> Self {
+        Self(
+            rand::thread_rng().gen(),
+            rand::thread_rng().gen(),
+            rand::thread_rng().gen(),
+        )
+    }
+
+    /// Create a new random Vec3 where all three values are in the range [0.0, 1.0)
+    pub fn new_random_range(min: f64, max: f64) -> Self {
+        Self(
+            rand::thread_rng().gen_range(min..max),
+            rand::thread_rng().gen_range(min..max),
+            rand::thread_rng().gen_range(min..max),
+        )
     }
 
     pub fn x(self) -> f64 {
