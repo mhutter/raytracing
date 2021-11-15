@@ -7,7 +7,7 @@ use rand::Rng;
 use raytracing::{
     camera::Camera,
     hittable::{Hittable, HittableList, Sphere},
-    material::Lambertian,
+    material::{Lambertian, Metal},
     ray::Ray,
     vec3::{Color, Vec3},
 };
@@ -42,17 +42,29 @@ fn main() -> Result<(), std::io::Error> {
 
     // World
     let world: HittableList = vec![
-        // sphere
+        // Ground
+        Box::new(Sphere {
+            center: Vec3::new(0, -100.5, -1),
+            radius: 100.0,
+            material: Lambertian::new(Color::new(0.8, 0.8, 0.0)),
+        }),
+        // Spheres - center
         Box::new(Sphere {
             center: Vec3::new(0, 0, -1),
             radius: 0.5,
             material: Lambertian::new(Color::new(0.7, 0.3, 0.3)),
         }),
-        // ground
+        // Spheres - left
         Box::new(Sphere {
-            center: Vec3::new(0, -100.5, -1),
-            radius: 100.0,
-            material: Lambertian::new(Color::new(0.8, 0.8, 0.0)),
+            center: Vec3::new(-1, 0, -1),
+            radius: 0.5,
+            material: Metal::new(Color::new(0.8, 0.8, 0.8)),
+        }),
+        // Spheres - right
+        Box::new(Sphere {
+            center: Vec3::new(1, 0, -1),
+            radius: 0.5,
+            material: Metal::new(Color::new(0.8, 0.6, 0.2)),
         }),
     ];
 

@@ -1,8 +1,16 @@
 use crate::{hittable::HitRecord, ray::Ray, vec3::Color};
 
 use super::Material;
+
+#[derive(Clone, Copy)]
 pub struct Metal {
     pub albedo: Color,
+}
+
+impl Metal {
+    pub fn new(albedo: Color) -> Self {
+        Self { albedo }
+    }
 }
 
 impl Material for Metal {
