@@ -7,7 +7,7 @@ use rand::Rng;
 use raytracing::{
     camera::Camera,
     hittable::{Hittable, HittableList, Sphere},
-    material::{Lambertian, Metal},
+    material::{Dielectric, Lambertian, Metal, ScatterResult},
     ray::Ray,
     vec3::{Color, Vec3},
 };
@@ -22,8 +22,10 @@ fn ray_color(ray: Ray, world: &impl Hittable, depth: u8) -> Color {
 
     if let Some(hit) = world.hit(ray, 0.001, INFINITY) {
         return match hit.material.scatter(ray, &hit) {
-            (scattered, Some(attenuation)) => attenuation * ray_color(scattered, world, depth - 1),
-            _ => Color::new(0, 0, 0),
+            ScatterResult::Scattered(scattered, attenuation) => {
+                attenuation * ray_color(scattered, world, depth - 1)
+            }
+            ScatterResult::Absorbed(_) => Color::new(0, 0, 0),
         };
     }
 
@@ -52,13 +54,13 @@ fn main() -> Result<(), std::io::Error> {
         Box::new(Sphere {
             center: Vec3::new(0, 0, -1),
             radius: 0.5,
-            material: Lambertian::new(Color::new(0.7, 0.3, 0.3)),
+            material: Dielectric::new(1.5),
         }),
         // Spheres - left
         Box::new(Sphere {
             center: Vec3::new(-1, 0, -1),
             radius: 0.5,
-            material: Metal::new(Color::new(0.8, 0.8, 0.8), 0.3),
+            material: Dielectric::new(1.5),
         }),
         // Spheres - right
         Box::new(Sphere {

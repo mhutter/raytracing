@@ -86,4 +86,4 @@
 
 ## 21 Add progress report
 
-![34f74c7dd7afe79d7187af3ee9ce1cdaa5002611](21_34f74c7.png)
+![6b95fed34511a0a78561eb4cc9bf3241b921cdd3](21_6b95fed.png)

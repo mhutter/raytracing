@@ -1,6 +1,6 @@
 use crate::{hittable::HitRecord, random_in_unit_sphere, ray::Ray, vec3::Color};
 
-use super::Material;
+use super::{Material, ScatterResult};
 
 #[derive(Clone, Copy)]
 pub struct Metal {
@@ -15,7 +15,7 @@ impl Metal {
 }
 
 impl Material for Metal {
-    fn scatter(&self, ray: Ray, rec: &HitRecord) -> (Ray, Option<Color>) {
+    fn scatter(&self, ray: Ray, rec: &HitRecord) -> ScatterResult {
         let reflected = ray.direction.reflect(rec.normal);
         let scattered = Ray {
             origin: rec.p,
@@ -23,8 +23,8 @@ impl Material for Metal {
         };
 
         match scattered.direction.dot(rec.normal) {
-            x if x > 0.0 => (scattered, Some(self.albedo)),
-            _ => (scattered, None),
+            x if x > 0.0 => ScatterResult::Scattered(scattered, self.albedo),
+            _ => ScatterResult::Absorbed(scattered),
         }
     }
 }

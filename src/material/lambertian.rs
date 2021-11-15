@@ -1,6 +1,6 @@
 use crate::{hittable::HitRecord, random_unit_vector, ray::Ray, vec3::Color};
 
-use super::Material;
+use super::{Material, ScatterResult};
 
 #[derive(Clone, Copy)]
 pub struct Lambertian {
@@ -14,18 +14,18 @@ impl Lambertian {
 }
 
 impl Material for Lambertian {
-    fn scatter(&self, _ray: Ray, rec: &HitRecord) -> (Ray, Option<Color>) {
+    fn scatter(&self, _ray: Ray, rec: &HitRecord) -> ScatterResult {
         let scatter_direction = match rec.normal + random_unit_vector() {
             dir if dir.near_zero() => rec.normal,
             dir => dir,
         };
 
-        (
+        ScatterResult::Scattered(
             Ray {
                 origin: rec.p,
                 direction: scatter_direction,
             },
-            Some(self.albedo),
+            self.albedo,
         )
     }
 }

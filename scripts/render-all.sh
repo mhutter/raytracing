@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e -u -o pipefail
 
-readme="progress/README.md"
+readme="target/README.md"
 echo "# Progress" > "$readme"
 
 n=0
