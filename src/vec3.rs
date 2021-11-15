@@ -6,6 +6,8 @@ pub mod point3;
 pub use point3::*;
 use rand::Rng;
 
+use crate::random_in_unit_sphere;
+
 /// Vec3 represents a three-dimensional vector
 #[derive(Debug, PartialEq, Clone, Copy, Default)]
 pub struct Vec3(pub f64, pub f64, pub f64);
@@ -107,6 +109,17 @@ impl Vec3 {
     /// TODO: write proper docs here
     pub fn unit_vector(self) -> Self {
         self / self.length()
+    }
+
+    /// Return a random vector pointing in the same hemisphere as "self"
+    pub fn random_in_hemisphere(self) -> Self {
+        let in_unit_sphere = random_in_unit_sphere();
+        if in_unit_sphere.dot(self) > 0.0 {
+            // in the same hemisphere as the normal ("self")
+            in_unit_sphere
+        } else {
+            -in_unit_sphere
+        }
     }
 }
 
