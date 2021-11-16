@@ -115,3 +115,7 @@
 ## 28 Smaller aperture
 
 ![afea95c497a0a77c67083ff92349a2fa2cb436d3](28_afea95c.png)
+
+## 29 Random Scene, improvements
+
+![752780034a47aa7088ac5db279fa606efecc0afc](29_7527800.png)

@@ -30,7 +30,7 @@ pub trait Hittable {
     fn hit(&self, ray: Ray, t_min: f64, t_max: f64) -> Option<HitRecord>;
 }
 
-pub type HittableList = Vec<Box<dyn Hittable>>;
+pub type HittableList = Vec<Box<dyn Hittable + Sync>>;
 
 impl Hittable for HittableList {
     fn hit(&self, ray: Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {

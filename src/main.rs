@@ -4,6 +4,7 @@ use std::{
 };
 
 use rand::Rng;
+use rayon::prelude::*;
 use raytracing::{
     camera::Camera,
     hittable::{Hittable, HittableList, Sphere},
@@ -52,7 +53,7 @@ fn random_scene() -> impl Hittable {
             let center = Point3::new(a + 0.9 * rng.gen::<f64>(), 0.2, b + 0.9 * rng.gen::<f64>());
 
             if (center - Vec3::new(4, 0.2, 0)).length() > 0.9 {
-                let sphere: Box<dyn Hittable> = match choose_mat {
+                let sphere: Box<dyn Hittable + Sync> = match choose_mat {
                     x if x < 0.8 => {
                         // Diffuse
                         let albedo = Color::random() * Color::random();
@@ -133,7 +134,7 @@ fn main() -> Result<(), std::io::Error> {
         write!(&stderr, "\rScanlines remaining: {} of {} ", j, IMAGE_HEIGHT)?;
         for i in 0..IMAGE_WIDTH {
             let color: Color = (0..SAMPLES_PER_PIXEL)
-                .into_iter()
+                .into_par_iter()
                 .map(|_| {
                     let u = (i as f64 + rand::thread_rng().gen::<f64>()) / width;
                     let v = (j as f64 + rand::thread_rng().gen::<f64>()) / height;
