@@ -107,3 +107,7 @@
 ## 26 Zooming in...
 
 ![e40fa1bf8bd3aa591e0c1fec47faadff51a543aa](26_e40fa1b.png)
+
+## 27 Defocus Blur
+
+![dab1e7ab6e649537b47c5304e1318614a82815f5](27_dab1e7a.png)
