@@ -99,3 +99,7 @@
 ## 24 Positionable Camera
 
 ![38a7da1ac7eab96c2371ae815f2cfbcb0d529887](24_38a7da1.png)
+
+## 25 Positioning & orienting Camera
+
+![3a1891c27881850a49288b9acc795d81950a2610](25_3a1891c.png)
