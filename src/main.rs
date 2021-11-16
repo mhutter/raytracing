@@ -34,6 +34,66 @@ fn ray_color(ray: Ray, world: &impl Hittable, depth: u8) -> Color {
     (1.0 - t) * Color::new(1, 1, 1) + t * Color::new(0.5, 0.7, 1.0)
 }
 
+fn random_scene() -> impl Hittable {
+    let mut world: HittableList = Vec::new();
+    let mut rng = rand::thread_rng();
+
+    // Floor
+    world.push(Box::new(Sphere::new(
+        Point3::new(0, -1000, 0),
+        1000.0,
+        Lambertian::new(Color::new(0.5, 0.5, 0.5)),
+    )));
+
+    for a in -11..11 {
+        for b in -11..11 {
+            let (a, b) = (a as f64, b as f64);
+            let choose_mat: f64 = rng.gen();
+            let center = Point3::new(a + 0.9 * rng.gen::<f64>(), 0.2, b + 0.9 * rng.gen::<f64>());
+
+            if (center - Vec3::new(4, 0.2, 0)).length() > 0.9 {
+                let sphere: Box<dyn Hittable> = match choose_mat {
+                    x if x < 0.8 => {
+                        // Diffuse
+                        let albedo = Color::random() * Color::random();
+                        Box::new(Sphere::new(center, 0.2, Lambertian::new(albedo)))
+                    }
+                    x if x < 0.95 => {
+                        // Metal
+                        let albedo = Color::random_range(0.5, 1.0);
+                        let fuzz = rng.gen_range(0.0..0.5);
+                        Box::new(Sphere::new(center, 0.2, Metal::new(albedo, fuzz)))
+                    }
+                    _ => {
+                        // Glass
+                        Box::new(Sphere::new(center, 0.2, Dielectric::new(1.5)))
+                    }
+                };
+
+                world.push(sphere);
+            }
+        }
+    }
+
+    world.push(Box::new(Sphere::new(
+        Point3::new(0, 1, 0),
+        1.0,
+        Dielectric::new(1.5),
+    )));
+    world.push(Box::new(Sphere::new(
+        Point3::new(-4, 1, 0),
+        1.0,
+        Lambertian::new(Color::new(0.4, 0.2, 0.1)),
+    )));
+    world.push(Box::new(Sphere::new(
+        Point3::new(4, 1, 0),
+        1.0,
+        Metal::new(Color::new(0.7, 0.6, 0.5), 0.0),
+    )));
+
+    world
+}
+
 fn main() -> Result<(), std::io::Error> {
     // Image
     const ASPECT_RATIO: f64 = 16.0 / 9.0;
@@ -43,44 +103,14 @@ fn main() -> Result<(), std::io::Error> {
     const MAX_DEPTH: u8 = 50;
 
     // World
-    let world: HittableList = vec![
-        // Ground
-        Box::new(Sphere {
-            center: Vec3::new(0, -100.5, -1),
-            radius: 100.0,
-            material: Lambertian::new(Color::new(0.8, 0.8, 0.0)),
-        }),
-        // Spheres - center
-        Box::new(Sphere {
-            center: Vec3::new(0, 0, -1),
-            radius: 0.5,
-            material: Lambertian::new(Color::new(0.1, 0.2, 0.5)),
-        }),
-        // Spheres - left
-        Box::new(Sphere {
-            center: Vec3::new(-1, 0, -1),
-            radius: 0.5,
-            material: Dielectric::new(1.5),
-        }),
-        Box::new(Sphere {
-            center: Vec3::new(-1, 0, -1),
-            radius: -0.4,
-            material: Dielectric::new(1.5),
-        }),
-        // Spheres - right
-        Box::new(Sphere {
-            center: Vec3::new(1, 0, -1),
-            radius: 0.5,
-            material: Metal::new(Color::new(0.8, 0.6, 0.2), 1.0),
-        }),
-    ];
+    let world = random_scene();
 
     // Camera
-    let lookfrom = Point3::new(-2, 2, 1);
-    let lookat = Point3::new(0, 0, -1);
+    let lookfrom = Point3::new(13, 2, 3);
+    let lookat = Point3::new(0, 0, 0);
     let vup = Vec3::new(0, 1, 0);
-    let focus_dist = (lookfrom - lookat).length();
-    let aperture = 1.0;
+    let focus_dist = 10.0;
+    let aperture = 0.1;
 
     let camera = Camera::new(
         lookfrom,
@@ -102,13 +132,15 @@ fn main() -> Result<(), std::io::Error> {
     for j in (0..IMAGE_HEIGHT).rev() {
         write!(&stderr, "\rScanlines remaining: {} of {} ", j, IMAGE_HEIGHT)?;
         for i in 0..IMAGE_WIDTH {
-            let mut color = Color::default();
-            for _ in 0..SAMPLES_PER_PIXEL {
-                let u = (i as f64 + rand::thread_rng().gen::<f64>()) / width;
-                let v = (j as f64 + rand::thread_rng().gen::<f64>()) / height;
-                let ray = camera.get_ray(u, v);
-                color += ray_color(ray, &world, MAX_DEPTH);
-            }
+            let color: Color = (0..SAMPLES_PER_PIXEL)
+                .into_iter()
+                .map(|_| {
+                    let u = (i as f64 + rand::thread_rng().gen::<f64>()) / width;
+                    let v = (j as f64 + rand::thread_rng().gen::<f64>()) / height;
+                    let ray = camera.get_ray(u, v);
+                    ray_color(ray, &world, MAX_DEPTH)
+                })
+                .sum();
             color.write(&mut stdout, SAMPLES_PER_PIXEL)?;
         }
     }

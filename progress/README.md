@@ -111,3 +111,7 @@
 ## 27 Defocus Blur
 
 ![dab1e7ab6e649537b47c5304e1318614a82815f5](27_dab1e7a.png)
+
+## 28 Smaller aperture
+
+![afea95c497a0a77c67083ff92349a2fa2cb436d3](28_afea95c.png)

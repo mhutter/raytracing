@@ -1,10 +1,23 @@
 use std::io::{Result, Write};
 
+use rand::{distributions::Uniform, Rng};
+
 use super::Vec3;
 
 pub type Color = Vec3;
 
 impl Color {
+    pub fn random() -> Self {
+        let mut rng = rand::thread_rng();
+        Self(rng.gen(), rng.gen(), rng.gen())
+    }
+
+    pub fn random_range(low: f64, high: f64) -> Self {
+        let distr = Uniform::new(low, high);
+        let mut rng = rand::thread_rng();
+        Self(rng.sample(distr), rng.sample(distr), rng.sample(distr))
+    }
+
     pub fn write(self, out: &mut dyn Write, samples_per_pixel: i32) -> Result<()> {
         let Vec3(r, g, b) = self / (samples_per_pixel as f64);
 

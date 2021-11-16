@@ -1,4 +1,7 @@
-use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
+use std::{
+    iter::Sum,
+    ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign},
+};
 
 use rand::{distributions::Uniform, Rng};
 
@@ -260,8 +263,16 @@ impl Neg for Vec3 {
     }
 }
 
+impl Sum for Vec3 {
+    fn sum<I: Iterator<Item = Self>>(iter: I) -> Self {
+        iter.fold(Self::default(), |a, b| a + b)
+    }
+}
+
 #[cfg(test)]
 mod tests {
+    use rayon::vec;
+
     use super::*;
 
     #[test]
@@ -409,5 +420,12 @@ mod tests {
 
         assert_eq!(Vec3::new(-1, -2, -3), -a);
         assert_eq!(Vec3::new(-4, -5, -6), -b);
+    }
+
+    #[test]
+    fn test_sum() {
+        let vec = vec![Vec3::new(1, 2, 3), Vec3::new(4, 5, 6), Vec3::new(7, 8, 9)];
+
+        assert_eq!(Vec3::new(12, 15, 18), vec.into_iter().sum());
     }
 }
