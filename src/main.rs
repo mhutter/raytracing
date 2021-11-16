@@ -1,5 +1,4 @@
 use std::{
-    f64::consts::PI,
     f64::INFINITY,
     io::{stderr, stdout, BufWriter, Write},
 };
@@ -8,9 +7,9 @@ use rand::Rng;
 use raytracing::{
     camera::Camera,
     hittable::{Hittable, HittableList, Sphere},
-    material::{Lambertian, ScatterResult},
+    material::{Dielectric, Lambertian, Metal, ScatterResult},
     ray::Ray,
-    vec3::{Color, Vec3},
+    vec3::{Color, Point3, Vec3},
 };
 
 const FACTOR: f64 = 1.0;
@@ -44,22 +43,46 @@ fn main() -> Result<(), std::io::Error> {
     const MAX_DEPTH: u8 = 50;
 
     // World
-    let r = (PI / 4.0).cos();
     let world: HittableList = vec![
+        // Ground
         Box::new(Sphere {
-            center: Vec3::new(-r, 0, -1),
-            radius: r,
-            material: Lambertian::new(Color::new(0, 0, 1)),
+            center: Vec3::new(0, -100.5, -1),
+            radius: 100.0,
+            material: Lambertian::new(Color::new(0.8, 0.8, 0.0)),
+        }),
+        // Spheres - center
+        Box::new(Sphere {
+            center: Vec3::new(0, 0, -1),
+            radius: 0.5,
+            material: Lambertian::new(Color::new(0.1, 0.2, 0.5)),
+        }),
+        // Spheres - left
+        Box::new(Sphere {
+            center: Vec3::new(-1, 0, -1),
+            radius: 0.5,
+            material: Dielectric::new(1.5),
         }),
         Box::new(Sphere {
-            center: Vec3::new(r, 0, -1),
-            radius: r,
-            material: Lambertian::new(Color::new(1, 0, 0)),
+            center: Vec3::new(-1, 0, -1),
+            radius: -0.4,
+            material: Dielectric::new(1.5),
+        }),
+        // Spheres - right
+        Box::new(Sphere {
+            center: Vec3::new(1, 0, -1),
+            radius: 0.5,
+            material: Metal::new(Color::new(0.8, 0.6, 0.2), 1.0),
         }),
     ];
 
     // Camera
-    let camera = Camera::new(90.0, ASPECT_RATIO);
+    let camera = Camera::new(
+        Point3::new(-2, 2, 1),
+        Point3::new(0, 0, -1),
+        Vec3::new(0, 1, 0),
+        90.0,
+        ASPECT_RATIO,
+    );
 
     // Render
     println!("P3\n{} {}\n255", IMAGE_WIDTH, IMAGE_HEIGHT);

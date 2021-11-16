@@ -95,3 +95,7 @@
 ## 23 Hollow glass sphere
 
 ![ddf80b6a617c7b58806c33590864e8ba7a669251](23_ddf80b6.png)
+
+## 24 Positionable Camera
+
+![38a7da1ac7eab96c2371ae815f2cfbcb0d529887](24_38a7da1.png)
