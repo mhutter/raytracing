@@ -9,7 +9,7 @@ git stash
 git rev-list main | \
 tail -r | \
 while read -r rev; do
-  printf -v ppm '%02d_%s.ppm' $n "${rev:0:7}"
+  printf -v ppm 'target/%02d_%s.ppm' $n "${rev:0:7}"
   printf -v png '%02d_%s.png' $n "${rev:0:7}"
   printf -v entry '\n## %02d %s\n\n![%s](%s)' \
     $n \
@@ -25,7 +25,7 @@ while read -r rev; do
     cargo run --release > "$ppm"
   }
 
-  [ -f "$png" ] || convert "$ppm" "progress/$png"
+  [ -f "progress/$png" ] || convert "$ppm" "progress/$png"
 done
 
 git checkout --quiet main

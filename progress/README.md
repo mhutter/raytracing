@@ -91,3 +91,7 @@
 ## 22 Refraction
 
 ![b91e4a59ad4ae651bc892551d55798204dd371e1](22_b91e4a5.png)
+
+## 23 Hollow glass sphere
+
+![ddf80b6a617c7b58806c33590864e8ba7a669251](23_ddf80b6.png)
