@@ -103,3 +103,7 @@
 ## 25 Positioning & orienting Camera
 
 ![3a1891c27881850a49288b9acc795d81950a2610](25_3a1891c.png)
+
+## 26 Zooming in...
+
+![e40fa1bf8bd3aa591e0c1fec47faadff51a543aa](26_e40fa1b.png)

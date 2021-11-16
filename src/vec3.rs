@@ -1,12 +1,13 @@
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
+use rand::{distributions::Uniform, Rng};
+
+use crate::random_in_unit_sphere;
+
 pub mod color;
 pub use color::*;
 pub mod point3;
 pub use point3::*;
-use rand::Rng;
-
-use crate::random_in_unit_sphere;
 
 /// Vec3 represents a three-dimensional vector
 #[derive(Debug, PartialEq, Clone, Copy, Default)]
@@ -119,6 +120,20 @@ impl Vec3 {
             in_unit_sphere
         } else {
             -in_unit_sphere
+        }
+    }
+
+    pub fn random_in_unit_disk() -> Self {
+        // Preparing uniform distribution beforehand performs better when
+        // multiple values are generated.
+        let distr = Uniform::from(-1.0..1.0);
+        let mut rng = rand::thread_rng();
+
+        loop {
+            let p = Vec3(rng.sample(distr), rng.sample(distr), 0.0);
+            if p.length_squared() < 1.0 {
+                return p;
+            }
         }
     }
 

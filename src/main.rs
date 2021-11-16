@@ -76,12 +76,20 @@ fn main() -> Result<(), std::io::Error> {
     ];
 
     // Camera
+    let lookfrom = Point3::new(-2, 2, 1);
+    let lookat = Point3::new(0, 0, -1);
+    let vup = Vec3::new(0, 1, 0);
+    let focus_dist = (lookfrom - lookat).length();
+    let aperture = 2.0;
+
     let camera = Camera::new(
-        Point3::new(-2, 2, 1),
-        Point3::new(0, 0, -1),
-        Vec3::new(0, 1, 0),
+        lookfrom,
+        lookat,
+        vup,
         20.0,
         ASPECT_RATIO,
+        aperture,
+        focus_dist,
     );
 
     // Render
