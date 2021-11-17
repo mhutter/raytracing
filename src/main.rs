@@ -13,8 +13,6 @@ use raytracing::{
     vec3::{Color, Point3, Vec3},
 };
 
-const FACTOR: f64 = 1.0;
-
 fn ray_color(ray: Ray, world: &impl Hittable, depth: u8) -> Color {
     if depth == 0 {
         // exceeded the ray bounce limit, no light is gathered.
@@ -98,7 +96,7 @@ fn random_scene() -> impl Hittable {
 fn main() -> Result<(), std::io::Error> {
     // Image
     const ASPECT_RATIO: f64 = 16.0 / 9.0;
-    const IMAGE_WIDTH: i32 = (400.0 * FACTOR) as i32;
+    const IMAGE_WIDTH: i32 = 400;
     const IMAGE_HEIGHT: i32 = (IMAGE_WIDTH as f64 / ASPECT_RATIO) as i32;
     const SAMPLES_PER_PIXEL: i32 = 100;
     const MAX_DEPTH: u8 = 50;
