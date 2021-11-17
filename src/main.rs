@@ -1,6 +1,6 @@
 use std::{
     f64::INFINITY,
-    io::{stderr, stdout, BufWriter, Write},
+    io::{stderr, Write},
     time::Instant,
 };
 
@@ -125,27 +125,38 @@ fn main() -> Result<(), std::io::Error> {
     );
 
     // Render
-    println!("P3\n{} {}\n255", IMAGE_WIDTH, IMAGE_HEIGHT);
     let stderr = stderr();
-    let mut stdout = BufWriter::new(stdout());
     let width = (IMAGE_WIDTH - 1) as f64;
     let height = (IMAGE_HEIGHT - 1) as f64;
+    let samples = SAMPLES_PER_PIXEL as f64;
+
+    println!("P3\n{} {}\n255", IMAGE_WIDTH, IMAGE_HEIGHT);
 
     for j in (0..IMAGE_HEIGHT).rev() {
+        // For each line in the image
         write!(&stderr, "\rScanlines remaining: {} of {} ", j, IMAGE_HEIGHT)?;
-        for i in 0..IMAGE_WIDTH {
-            let color: Color = (0..SAMPLES_PER_PIXEL)
-                .into_par_iter()
-                .map(|_| {
-                    let u = (i as f64 + rand::thread_rng().gen::<f64>()) / width;
-                    let v = (j as f64 + rand::thread_rng().gen::<f64>()) / height;
-                    let ray = camera.get_ray(u, v);
-                    ray_color(ray, &world, MAX_DEPTH)
-                })
-                .sum();
-            color.write(&mut stdout, SAMPLES_PER_PIXEL)?;
-        }
+
+        let line: String = (0..IMAGE_WIDTH)
+            .into_par_iter()
+            .map(|i| {
+                // For each pixel in a line
+                (0..SAMPLES_PER_PIXEL)
+                    .into_par_iter()
+                    .map(|_| {
+                        let u = (i as f64 + rand::thread_rng().gen::<f64>()) / width;
+                        let v = (j as f64 + rand::thread_rng().gen::<f64>()) / height;
+                        let ray = camera.get_ray(u, v);
+                        ray_color(ray, &world, MAX_DEPTH)
+                    })
+                    .sum::<Color>()
+                    / samples
+            })
+            .map(|color| color.to_string())
+            .collect::<Vec<String>>()
+            .join("\n");
+
+        println!("{}", line);
     }
-    stdout.flush()?;
+
     write!(&stderr, "\nDone in {}s\n", start.elapsed().as_secs())
 }

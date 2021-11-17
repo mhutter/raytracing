@@ -1,4 +1,4 @@
-use std::io::{Result, Write};
+use std::fmt::Display;
 
 use rand::{distributions::Uniform, Rng};
 
@@ -17,21 +17,34 @@ impl Color {
         let mut rng = rand::thread_rng();
         Self(rng.sample(distr), rng.sample(distr), rng.sample(distr))
     }
+}
 
-    pub fn write(self, out: &mut dyn Write, samples_per_pixel: i32) -> Result<()> {
-        let Vec3(r, g, b) = self / (samples_per_pixel as f64);
+impl Display for Color {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let Vec3(r, g, b) = self;
 
         // gamma-correct for gamma=2.0
         let r = r.sqrt();
         let g = g.sqrt();
         let b = b.sqrt();
 
-        writeln!(
-            out,
+        write!(
+            f,
             "{} {} {}",
             (256.0 * r.clamp(0.0, 0.999)) as i32,
             (256.0 * g.clamp(0.0, 0.999)) as i32,
             (256.0 * b.clamp(0.0, 0.999)) as i32,
         )
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_display() {
+        let c = Color::new(0, 0.5, 1);
+        assert_eq!("0 181 255", format!("{}", c));
     }
 }

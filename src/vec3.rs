@@ -271,8 +271,6 @@ impl Sum for Vec3 {
 
 #[cfg(test)]
 mod tests {
-    use rayon::vec;
-
     use super::*;
 
     #[test]
