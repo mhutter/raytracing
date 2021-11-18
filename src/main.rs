@@ -1,6 +1,7 @@
 use std::{
     f64::INFINITY,
     io::{stderr, stdout, BufWriter, Write},
+    time::Instant,
 };
 
 use rand::Rng;
@@ -94,6 +95,8 @@ fn random_scene() -> impl Hittable {
 }
 
 fn main() -> Result<(), std::io::Error> {
+    let start = Instant::now();
+
     // Image
     const ASPECT_RATIO: f64 = 16.0 / 9.0;
     const IMAGE_WIDTH: i32 = 400;
@@ -144,5 +147,5 @@ fn main() -> Result<(), std::io::Error> {
         }
     }
     stdout.flush()?;
-    write!(&stderr, "\nDone\n")
+    write!(&stderr, "\nDone in {}s\n", start.elapsed().as_secs())
 }
