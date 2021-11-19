@@ -1,3 +1,5 @@
+use rand::prelude::SmallRng;
+
 use crate::{
     degrees_to_radians,
     ray::Ray,
@@ -50,7 +52,7 @@ impl Camera {
         }
     }
 
-    pub fn get_ray(&self, s: f64, t: f64) -> Ray {
+    pub fn get_ray(&self, s: f64, t: f64, rng: &mut SmallRng) -> Ray {
         let &Camera {
             origin,
             lower_left_corner,
@@ -62,7 +64,7 @@ impl Camera {
             ..
         } = self;
 
-        let rd = lens_radius * Vec3::random_in_unit_disk();
+        let rd = lens_radius * Vec3::random_in_unit_disk(rng);
         let offset = u * rd.x() + v * rd.y();
 
         let direction = lower_left_corner + s * horizontal + t * vertical - origin - offset;

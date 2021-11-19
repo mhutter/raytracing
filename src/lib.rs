@@ -1,5 +1,6 @@
 use std::f64::consts::PI;
 
+use rand::{prelude::SmallRng, Rng};
 use vec3::{Point3, Vec3};
 
 pub mod camera;
@@ -12,15 +13,19 @@ pub fn degrees_to_radians(degrees: f64) -> f64 {
     degrees * PI / 180.0
 }
 
-pub fn random_in_unit_sphere() -> Point3 {
+pub fn random_in_unit_sphere(rng: &mut SmallRng) -> Point3 {
     loop {
-        let p = Point3::new_random_range(-1.0, 1.0);
+        let p: Point3 = Vec3(
+            rng.gen_range(-1.0..1.0),
+            rng.gen_range(-1.0..1.0),
+            rng.gen_range(-1.0..1.0),
+        );
         if p.length_squared() < 1.0 {
             return p;
         }
     }
 }
 
-pub fn random_unit_vector() -> Vec3 {
-    random_in_unit_sphere().unit_vector()
+pub fn random_unit_vector(rng: &mut SmallRng) -> Vec3 {
+    random_in_unit_sphere(rng).unit_vector()
 }

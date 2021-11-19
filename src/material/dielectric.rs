@@ -1,4 +1,4 @@
-use rand::Rng;
+use rand::{prelude::SmallRng, Rng};
 
 use crate::{hittable::HitRecord, ray::Ray, vec3::Color};
 
@@ -17,7 +17,7 @@ impl Dielectric {
 }
 
 impl Material for Dielectric {
-    fn scatter(&self, ray: Ray, rec: &HitRecord) -> ScatterResult {
+    fn scatter(&self, ray: Ray, rec: &HitRecord, rng: &mut SmallRng) -> ScatterResult {
         let refraction_ratio = if rec.front_face {
             1.0 / self.ir
         } else {
@@ -28,9 +28,7 @@ impl Material for Dielectric {
         let sin_theta = (1.0 - cos_theta * cos_theta).sqrt();
 
         let cannot_refract = refraction_ratio * sin_theta > 1.0;
-        let direction = if cannot_refract
-            || reflectance(cos_theta, refraction_ratio) > rand::thread_rng().gen()
-        {
+        let direction = if cannot_refract || reflectance(cos_theta, refraction_ratio) > rng.gen() {
             unit_direction.reflect(rec.normal)
         } else {
             unit_direction.refract(rec.normal, refraction_ratio)

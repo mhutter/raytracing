@@ -3,7 +3,7 @@ use std::{
     ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign},
 };
 
-use rand::{distributions::Uniform, Rng};
+use rand::{distributions::Uniform, prelude::SmallRng, Rng};
 
 use crate::random_in_unit_sphere;
 
@@ -53,20 +53,16 @@ impl Vec3 {
     /// assert!(r.2 >= 0.0);
     /// assert!(r.2 < 1.0);
     /// ```
-    pub fn new_random() -> Self {
-        Self(
-            rand::thread_rng().gen(),
-            rand::thread_rng().gen(),
-            rand::thread_rng().gen(),
-        )
+    pub fn new_random(rng: &mut SmallRng) -> Self {
+        Self::new_random_range(rng, 0.0, 1.0)
     }
 
     /// Create a new random Vec3 where all three values are in the range [0.0, 1.0)
-    pub fn new_random_range(min: f64, max: f64) -> Self {
+    pub fn new_random_range(rng: &mut SmallRng, min: f64, max: f64) -> Self {
         Self(
-            rand::thread_rng().gen_range(min..max),
-            rand::thread_rng().gen_range(min..max),
-            rand::thread_rng().gen_range(min..max),
+            rng.gen_range(min..max),
+            rng.gen_range(min..max),
+            rng.gen_range(min..max),
         )
     }
 
@@ -80,17 +76,17 @@ impl Vec3 {
         self.2
     }
 
-    /// TODO: write proper docs here
+    /// Get the length of the vector
     pub fn length(self) -> f64 {
         self.length_squared().sqrt()
     }
 
-    /// TODO: write proper docs here
+    /// Get the square of the length of the vector
     pub fn length_squared(self) -> f64 {
         self.dot(self)
     }
 
-    /// TODO: write proper docs here
+    /// Calculate the dot product of `self` and `rhs`
     pub fn dot(self, rhs: Self) -> f64 {
         let Vec3(sx, sy, sz) = self;
         let Vec3(rx, ry, rz) = rhs;
@@ -98,7 +94,7 @@ impl Vec3 {
         sx * rx + sy * ry + sz * rz
     }
 
-    /// TODO: write proper docs here
+    /// Calculate the cross product of `self` and `rhs`
     pub fn cross(self, rhs: Self) -> Self {
         let Vec3(sx, sy, sz) = self;
         let Vec3(rx, ry, rz) = rhs;
@@ -110,14 +106,15 @@ impl Vec3 {
         Self(x, y, z)
     }
 
-    /// TODO: write proper docs here
+    /// Calculate an unit vector (a vector of length 1) pointing in the
+    /// same direction as `self`
     pub fn unit_vector(self) -> Self {
         self / self.length()
     }
 
     /// Return a random vector pointing in the same hemisphere as "self"
-    pub fn random_in_hemisphere(self) -> Self {
-        let in_unit_sphere = random_in_unit_sphere();
+    pub fn random_in_hemisphere(self, rng: &mut SmallRng) -> Self {
+        let in_unit_sphere = random_in_unit_sphere(rng);
         if in_unit_sphere.dot(self) > 0.0 {
             // in the same hemisphere as the normal ("self")
             in_unit_sphere
@@ -126,11 +123,10 @@ impl Vec3 {
         }
     }
 
-    pub fn random_in_unit_disk() -> Self {
+    pub fn random_in_unit_disk(rng: &mut SmallRng) -> Self {
         // Preparing uniform distribution beforehand performs better when
         // multiple values are generated.
         let distr = Uniform::from(-1.0..1.0);
-        let mut rng = rand::thread_rng();
 
         loop {
             let p = Vec3(rng.sample(distr), rng.sample(distr), 0.0);

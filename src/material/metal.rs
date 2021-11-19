@@ -1,3 +1,5 @@
+use rand::prelude::SmallRng;
+
 use crate::{hittable::HitRecord, random_in_unit_sphere, ray::Ray, vec3::Color};
 
 use super::{Material, ScatterResult};
@@ -15,11 +17,11 @@ impl Metal {
 }
 
 impl Material for Metal {
-    fn scatter(&self, ray: Ray, rec: &HitRecord) -> ScatterResult {
+    fn scatter(&self, ray: Ray, rec: &HitRecord, rng: &mut SmallRng) -> ScatterResult {
         let reflected = ray.direction.reflect(rec.normal);
         let scattered = Ray {
             origin: rec.p,
-            direction: reflected + self.fuzz * random_in_unit_sphere(),
+            direction: reflected + self.fuzz * random_in_unit_sphere(rng),
         };
 
         match scattered.direction.dot(rec.normal) {

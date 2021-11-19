@@ -23,7 +23,7 @@ impl<M: Material> Sphere<M> {
     }
 }
 
-impl<M: 'static + Material + Copy> Hittable for Sphere<M> {
+impl<M: 'static + Material + Clone> Hittable for Sphere<M> {
     fn hit(&self, ray: Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let oc = ray.origin - self.center;
         let a = ray.direction.length_squared();
@@ -51,7 +51,7 @@ impl<M: 'static + Material + Copy> Hittable for Sphere<M> {
         let mut hit = HitRecord {
             t: root,
             p: ray.at(root),
-            material: Box::new(self.material),
+            material: Box::new(self.material.clone()),
             normal: Vec3::default(),
             front_face: true,
         };
