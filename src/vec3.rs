@@ -44,8 +44,10 @@ impl Vec3 {
     /// Example:
     /// ```
     /// use raytracing::vec3::Vec3;
+    /// use rand::prelude::*;
     ///
-    /// let r = Vec3::new_random();
+    /// let mut rng = SmallRng::from_entropy();
+    /// let r = Vec3::new_random(&mut rng);
     /// assert!(r.0 >= 0.0);
     /// assert!(r.0 < 1.0);
     /// assert!(r.1 >= 0.0);
