@@ -24,14 +24,14 @@ impl Material for Dielectric {
             self.ir
         };
         let unit_direction = ray.direction.unit_vector();
-        let cos_theta = (-unit_direction).dot(rec.normal).min(1.0);
+        let cos_theta = (-unit_direction).dot(&rec.normal).min(1.0);
         let sin_theta = (1.0 - cos_theta * cos_theta).sqrt();
 
         let cannot_refract = refraction_ratio * sin_theta > 1.0;
         let direction = if cannot_refract || reflectance(cos_theta, refraction_ratio) > rng.gen() {
-            unit_direction.reflect(rec.normal)
+            unit_direction.reflect(&rec.normal)
         } else {
-            unit_direction.refract(rec.normal, refraction_ratio)
+            unit_direction.refract(&rec.normal, refraction_ratio)
         };
 
         ScatterResult::Scattered(

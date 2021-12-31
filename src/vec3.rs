@@ -84,16 +84,13 @@ impl Vec3 {
     }
 
     /// Get the square of the length of the vector
-    pub fn length_squared(self) -> f64 {
+    pub fn length_squared(&self) -> f64 {
         self.dot(self)
     }
 
     /// Calculate the dot product of `self` and `rhs`
-    pub fn dot(self, rhs: Self) -> f64 {
-        let Vec3(sx, sy, sz) = self;
-        let Vec3(rx, ry, rz) = rhs;
-
-        sx * rx + sy * ry + sz * rz
+    pub fn dot(&self, rhs: &Self) -> f64 {
+        self.0 * rhs.0 + self.1 * rhs.1 + self.2 * rhs.2
     }
 
     /// Calculate the cross product of `self` and `rhs`
@@ -115,7 +112,7 @@ impl Vec3 {
     }
 
     /// Return a random vector pointing in the same hemisphere as "self"
-    pub fn random_in_hemisphere(self, rng: &mut SmallRng) -> Self {
+    pub fn random_in_hemisphere(&self, rng: &mut SmallRng) -> Self {
         let in_unit_sphere = random_in_unit_sphere(rng);
         if in_unit_sphere.dot(self) > 0.0 {
             // in the same hemisphere as the normal ("self")
@@ -144,14 +141,14 @@ impl Vec3 {
         (self.0.abs() < s) && (self.1.abs() < s) && (self.2.abs() < s)
     }
 
-    pub fn reflect(self, normal: Self) -> Self {
-        self - 2.0 * self.dot(normal) * normal
+    pub fn reflect(&self, normal: &Self) -> Self {
+        *self - 2.0 * self.dot(normal) * *normal
     }
 
-    pub fn refract(self, normal: Self, etai_over_etat: f64) -> Self {
-        let cos_theta = (-self).dot(normal).min(1.0);
-        let r_out_perp = etai_over_etat * (self + cos_theta * normal);
-        let r_out_parallel = (-(1.0 - r_out_perp.length_squared()).abs().sqrt()) * normal;
+    pub fn refract(&self, normal: &Self, etai_over_etat: f64) -> Self {
+        let cos_theta = (-*self).dot(normal).min(1.0);
+        let r_out_perp = etai_over_etat * (*self + cos_theta * *normal);
+        let r_out_parallel = (-(1.0 - r_out_perp.length_squared()).abs().sqrt()) * *normal;
         r_out_perp + r_out_parallel
     }
 }
@@ -292,8 +289,8 @@ mod tests {
 
     #[test]
     fn test_dot() {
-        let a = Vec3::new(1, 2, 3);
-        let b = Vec3::new(4, 5, 6);
+        let a = &Vec3::new(1, 2, 3);
+        let b = &Vec3::new(4, 5, 6);
         assert_eq!(14.0, a.dot(a));
         assert_eq!(32.0, a.dot(b));
         assert_eq!(77.0, b.dot(b));

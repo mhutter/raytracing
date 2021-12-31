@@ -18,13 +18,13 @@ impl Metal {
 
 impl Material for Metal {
     fn scatter(&self, ray: Ray, rec: &HitRecord, rng: &mut SmallRng) -> ScatterResult {
-        let reflected = ray.direction.reflect(rec.normal);
+        let reflected = ray.direction.reflect(&rec.normal);
         let scattered = Ray {
             origin: rec.p,
             direction: reflected + self.fuzz * random_in_unit_sphere(rng),
         };
 
-        match scattered.direction.dot(rec.normal) {
+        match scattered.direction.dot(&rec.normal) {
             x if x > 0.0 => ScatterResult::Scattered(scattered, self.albedo),
             _ => ScatterResult::Absorbed(scattered),
         }
