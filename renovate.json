@@ -1,4 +1,8 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["github>mhutter/.github:renovate-config"]
+  "extends": ["github>mhutter/.github:renovate-config"],
+  "packageRules": [{
+    "matchUpdateTypes": ["patch", "lockFileMaintenance"],
+    "automerge": true
+  }]
 }
