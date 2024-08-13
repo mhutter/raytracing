@@ -12,3 +12,8 @@ license = "MIT"
 [dependencies]
 rand = { version = "0.8", features = ["small_rng"] }
 rayon = "1"
+
+[profile.release]
+lto = true
+codegen-units = 1
+panic = "abort"
